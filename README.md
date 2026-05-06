@@ -9,7 +9,7 @@
       @@@@  (___)     `|/    Y    (_)@(_)  @@@@   \|/   (_)\
        /      Y       \|    \|/    /(_)    \|      |/      |
     \ |     \ |/       | / \ | /  \|/       |/    \|      \|/
-jgs \\|//   \\|///  \\\|//\\\|/// \|///  \\\|//  \\|//  \\\|//
+    \\|//   \\|///  \\\|//\\\|/// \|///  \\\|//  \\|//  \\\|//
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  
 ```
 
@@ -39,10 +39,3 @@ Certifique-se de ter o Python instalado na sua máquina.
 ```bash
 python main.py
 ```
-
-## Estrutura do Projeto
-
-*   `main.py`: Arquivo principal contendo a interface de usuário e a lógica do menu do jardim.
-
----
-*Bem-vinda de volta. O clima hoje é ameno.*
