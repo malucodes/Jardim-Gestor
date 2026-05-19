@@ -1,4 +1,4 @@
-# O Jardim (Jardim-Gestor)
+# ✦ O Jardim do Conhecimento (Jardim-Gestor)
 
 > "Nem toda semente brota no mesmo dia."
 
@@ -19,17 +19,17 @@ Neste aplicativo, você não lida com simples "tarefas a fazer" em uma lista fri
 
 À medida que você trabalha nessas atividades, você está cuidando e regando o seu plantio. O progresso de cada tarefa é visualizado como uma planta crescendo, ganhando folhas e, eventualmente, florescendo para a colheita. A proposta é trazer um pouco de leveza para a produtividade e reforçar a ideia de que grandes conquistas, assim como as grandes árvores, exigem dedicação contínua e tempo para crescer.
 
-## Funcionalidades
+## ✧ Funcionalidades
 
 A aplicação oferece um menu interativo com as seguintes opções:
 
-*   **[1] 🌱 Plantar**: Adicione uma nova atividade ao seu jardim (plante uma nova semente).
-*   **[2] 👁️ Contemplar**: Visualize todos os seus canteiros, acompanhando o status, a evolução e o crescimento das suas atividades atuais.
-*   **[3] 💧 Cuidar**: Regue o progresso das suas sementes (atualizando o andamento de uma tarefa) ou edite os detalhes para mantê-las saudáveis.
-*   **[4] ✂️ Colher**: Finalize projetos concluídos com sucesso (a colheita) ou faça a poda daquelas atividades que foram canceladas ou não são mais necessárias.
-*   **[5] 🚪 Sair**: Feche os portões do jardim até a sua próxima visita.
+*   **⊹ Plantar**: Adicione uma nova atividade ao seu jardim (plante uma nova semente).
+*   **⊹ Contemplar**: Visualize todos os seus canteiros, acompanhando o status, a evolução e o crescimento das suas atividades atuais.
+*   **⊹ Cuidar**: Regue o progresso das suas sementes (atualizando o andamento de uma tarefa) ou edite os detalhes para mantê-las saudáveis.
+*   **⊹ Colher**: Finalize projetos concluídos com sucesso (a colheita) ou faça a poda daquelas atividades que foram canceladas ou não são mais necessárias.
+*   **⊹ Sair**: Feche os portões do jardim até a sua próxima visita.
 
-## Como executar
+## ✶ Como executar
 
 Certifique-se de ter o Python instalado na sua máquina.
 
