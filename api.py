@@ -1,30 +1,24 @@
-import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
-
-# Importamos o seu motor limpo que criamos no passo anterior
 import jardim_core
 
-app = FastAPI(
-    title="O Jardim - API",
-    description="Motor de gestão de atividades e canteiros metafóricos.",
-    version="1.0.0"
-)
+app = FastAPI(title="Jardim-Gestor API")
 
-# Permitindo que sua futura interface (React, etc) converse com essa API
+# Configuração do CORS para permitir que o React/Front-end converse com a API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], # Em produção, colocamos a URL exata do front-end
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# O arquivo de banco de dados
 ARQUIVO_BD = "jardim.json"
 
-# --- ESTRUTURAS DE DADOS (Como a interface envia dados para cá) ---
+# --- MODELOS DE DADOS (Como o React deve enviar os dados para o Python) ---
 class SementeNova(BaseModel):
     nome: str
 
@@ -32,21 +26,22 @@ class SementeAtualizar(BaseModel):
     novo_nome: Optional[str] = None
     novo_status: Optional[bool] = None
 
-# --- ROTAS DO JARDIM ---
+# --- ROTAS DA API ---
 
 @app.get("/canteiros")
 def contemplar_jardim():
-    """Retorna todas as sementes plantadas"""
+    """Retorna todas as sementes plantadas (O antigo 'Contemplar')"""
     canteiro = jardim_core.carregar_dados(ARQUIVO_BD)
     return {"sementes": canteiro}
 
 @app.post("/plantar")
 def plantar_semente(semente: SementeNova):
-    """Adiciona uma nova semente ao solo"""
+    """Adiciona uma nova semente ao jardim (O antigo 'Plantar')"""
     canteiro = jardim_core.carregar_dados(ARQUIVO_BD)
 
+    # Verifica se já existe para não plantar duplicado
     if jardim_core.buscar_projeto(canteiro, semente.nome):
-        raise HTTPException(status_code=400, detail="Essa semente já está no solo!")
+        raise HTTPException(status_code=400, detail="Essa semente já foi plantada!")
 
     nova_semente = jardim_core.adicionar_projeto(canteiro, semente.nome)
     jardim_core.salvar_dados(canteiro, ARQUIVO_BD)
@@ -55,7 +50,7 @@ def plantar_semente(semente: SementeNova):
 
 @app.put("/cuidar/{nome_atual}")
 def cuidar_semente(nome_atual: str, dados: SementeAtualizar):
-    """Atualiza o status (regar) ou o nome de uma semente"""
+    """Atualiza o nome ou status da semente (O antigo 'Cuidar')"""
     canteiro = jardim_core.carregar_dados(ARQUIVO_BD)
 
     sucesso = jardim_core.atualizar_projeto(
@@ -66,14 +61,14 @@ def cuidar_semente(nome_atual: str, dados: SementeAtualizar):
     )
 
     if not sucesso:
-        raise HTTPException(status_code=404, detail="Semente não encontrada no jardim.")
+        raise HTTPException(status_code=404, detail="Semente não encontrada.")
 
     jardim_core.salvar_dados(canteiro, ARQUIVO_BD)
     return {"mensagem": f"Semente '{nome_atual}' cuidada com sucesso!"}
 
 @app.delete("/podar/{nome}")
 def podar_semente(nome: str):
-    """Remove uma semente (Colheita ou Poda)"""
+    """Remove uma semente do jardim (O antigo 'Colher/Deletar')"""
     canteiro = jardim_core.carregar_dados(ARQUIVO_BD)
 
     sucesso = jardim_core.deletar_projeto(canteiro, nome)
@@ -81,15 +76,4 @@ def podar_semente(nome: str):
         raise HTTPException(status_code=404, detail="Semente não encontrada.")
 
     jardim_core.salvar_dados(canteiro, ARQUIVO_BD)
-    return {"mensagem": f"Semente '{nome}' podada com sucesso."}
-
-# --- O NOVO BOTÃO DE LIGAR ---
-# Substitui aquele antigo 'while True' e inicia o servidor web
-if __name__ == "__main__":
-    print("=========================================================")
-    print("🌱 Preparando a terra... O Jardim está nascendo na Web!")
-    print("Para contemplar, acesse: http://localhost:8000/docs")
-    print("=========================================================")
-
-    # Inicia o servidor uvicorn apontando para este próprio arquivo (main)
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    return {"mensagem": f"Semente '{nome}' podada do jardim."}

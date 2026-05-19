@@ -1,0 +1,48 @@
+/* Efeito especial para quando a planta é concluída */
+.card-semente.floresceu {
+  border-color: #ffb3c6;
+  background-color: #fffafb;
+}
+
+.card-semente.floresceu h2 {
+  color: #ff8fab;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+/* Área dos novos botões de ação */
+.acoes-card {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.btn-regar, .btn-podar {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-regar {
+  background-color: #e6f4ea;
+  color: #2f855a;
+}
+
+.btn-regar:hover {
+  background-color: #c6f6d5;
+}
+
+.btn-podar {
+  background-color: #fee2e2;
+  color: #e53e3e;
+}
+
+.btn-podar:hover {
+  background-color: #fecaca;
+}
