@@ -30,7 +30,7 @@ function App() {
   };
 
   const carregarJardim = async () => {
-    const resposta = await fetch('http://localhost:8000/canteiros');
+    const resposta = await fetch('https://api-jardim.onrender.com/canteiros');
     const dados = await resposta.json();
     setSementes(dados.sementes);
   };
@@ -38,7 +38,7 @@ function App() {
   useEffect(() => { carregarJardim(); }, []);
 
   const lidarComNovoPlantio = async (dadosSemente) => {
-    const resposta = await fetch('http://localhost:8000/plantar', {
+    const resposta = await fetch('https://api-jardim.onrender.com/plantar', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dadosSemente)
     });
     if (!resposta.ok) { alert("Semente já existe ou erro de formato!"); return; }

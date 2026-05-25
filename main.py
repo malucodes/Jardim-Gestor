@@ -13,7 +13,10 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173", # Mantemos este para quando você for programar no PC
+        "https://jardim-digital-six.vercel.app" # O seu novo domínio oficial!
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
