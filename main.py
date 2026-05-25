@@ -52,29 +52,26 @@ def plantar_semente(semente: SementeNova):
     )
 
     if semente.google_token and semente.prazo and semente.prazo != "-":
-        url_google = "https://www.googleapis.com/calendar/v3/calendars/primary/events"
+        url_google = "https://tasks.googleapis.com/tasks/v1/lists/@default/tasks"
 
         headers = {
             "Authorization": f"Bearer {semente.google_token}",
             "Content-Type": "application/json"
         }
 
-        dados_evento = {
-            "summary": semente.nome,
-            "description": semente.descricao,
-            "start": {
-                "date": semente.prazo
-            },
-            "end": {
-                "date": semente.prazo
-            }
+        data_formatada = f"{semente.prazo}T12:00:00.000Z"
+
+        dados_tarefa = {
+            "title": semente.nome,
+            "notes": semente.descricao,
+            "due": data_formatada
         }
 
         try:
-            resposta_google = requests.post(url_google, headers=headers, json=dados_evento, timeout=5)
+            resposta_google = requests.post(url_google, headers=headers, json=dados_tarefa, timeout=5)
 
             if resposta_google.status_code == 200:
-                print("✅ Evento criado com sucesso no Google Calendar!")
+                print("✅ Tarefa criada com sucesso no Google Tasks!")
             else:
                 print(f"⚠️ Erro do Google: {resposta_google.text}")
 

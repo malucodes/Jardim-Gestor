@@ -26,14 +26,13 @@ function App() {
   const [sementeSelecionada, setSementeSelecionada] = useState("");
   const [mascoteAtual, setMascoteAtual] = useState(IconeMascotePadrao);
 
-  // 2. Criamos o estado e a função do Google aqui dentro do App
   const [googleToken, setGoogleToken] = useState(null);
 
   const conectarGoogle = useGoogleLogin({
-    scope: 'https://www.googleapis.com/auth/calendar.events',
+    scope: 'https://www.googleapis.com/auth/tasks',
     onSuccess: (tokenResponse) => {
       setGoogleToken(tokenResponse.access_token);
-      alert("Agenda conectada com sucesso! 🌿");
+      alert("Tarefas conectadas com sucesso! 🌿");
     },
     onError: (error) => console.log('Erro ao conectar:', error),
   });
