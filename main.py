@@ -14,8 +14,8 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173", # Mantemos este para quando você for programar no PC
-        "https://jardim-digital-six.vercel.app" # O seu novo domínio oficial!
+        "http://localhost:5173",
+        "https://jardim-digital-six.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -37,7 +37,6 @@ class SementeAtualizar(BaseModel):
 
 @app.get("/canteiros")
 def contemplar_jardim():
-    # Puxa tudo direto do banco de dados na nuvem
     canteiro = jardim_core.listar_projetos()
     return {"sementes": canteiro}
 

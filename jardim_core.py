@@ -17,9 +17,6 @@ pool_conexoes = pooling.MySQLConnectionPool(
 def conectar():
     return pool_conexoes.get_connection()
 
-# =====================================================================
-# 2. FUNÇÕES DE MANIPULAÇÃO DO JARDIM (CRUD)
-# =====================================================================
 def listar_projetos():
     db = conectar()
     cursor = db.cursor(dictionary=True)
@@ -88,9 +85,6 @@ def deletar_projeto(nome_projeto):
     db.close()
     return True
 
-# =====================================================================
-# 3. INICIALIZAÇÃO AUTOMÁTICA DO BANCO DE DADOS
-# =====================================================================
 def inicializar_banco():
     db = conectar()
     cursor = db.cursor()
@@ -111,5 +105,4 @@ def inicializar_banco():
     db.close()
     print("🌱 Terreno do banco de dados e Pool de Conexões preparados com sucesso!")
 
-# Executa a verificação assim que o servidor liga
 inicializar_banco()
