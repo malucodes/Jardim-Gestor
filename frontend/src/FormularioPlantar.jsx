@@ -88,11 +88,11 @@ export default function FormularioPlantar({ onPlantar, onFechar, googleToken }) 
                             <label htmlFor="prazo-tarefa">Prazo</label>
                             <input
                                 id="prazo-tarefa"
-                                type="text"
+                                type="date"
                                 className="campo-input"
-                                placeholder="Ex.: Amanhã, 15/10, Próxima semana..."
                                 value={prazo}
                                 onChange={(e) => setPrazo(e.target.value)}
+                                required
                             />
                         </div>
 
