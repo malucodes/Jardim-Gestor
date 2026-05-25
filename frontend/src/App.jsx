@@ -170,7 +170,7 @@ function App() {
 
             {tarefasVisiveis.length === 0 && (
                 <p style={{ color: 'var(--outline)', fontStyle: 'italic', gridColumn: '1 / -1', textAlign: 'center', padding: '32px' }}>
-                  {exibindoCesto ? 'Seu cesto está vazio.' : 'O canteiro está vazio. Plante uma semente!'}
+                  {exibindoCesto ? 'Sua estufa está vazia.' : 'O canteiro está vazio. Plante uma semente!'}
                 </p>
             )}
           </div>
