@@ -7,6 +7,7 @@ import IconeMascoteColher from './assets/mascote_concluidas.svg';
 import IconeMascotePodar from './assets/mascote_deletar.svg';
 import IconeCerca from './assets/cercas.svg'
 import IconeEstufa from './assets/estufa.svg'
+import IconeCalendario from './assets/calendario.svg'
 
 import CardPlanta from './CardPlanta';
 import FormularioPlantar from './FormularioPlantar';
@@ -133,33 +134,51 @@ function App() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '60px' }}>
 
             {!googleToken ? (
                 <button
-                    className="btn"
-                    style={{ backgroundColor: 'transparent', border: '2px solid #4285F4', color: '#4285F4' }}
+                    type="button"
                     onClick={() => conectarGoogle()}
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      color: 'var(--outline)',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '0',
+                      fontFamily: 'inherit'
+                    }}
                 >
-                  📅 Conectar Agenda
+                  <img src={IconeCalendario} alt="Ícone Calendario" style={{ width: '18px'}}/>
+                  <span style={{ textDecoration: 'underline' }}>Conectar Agenda</span>
                 </button>
             ) : (
-                <span style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--earth-brown)', display: 'flex', alignItems: 'center', padding: '0 12px' }}>
-                🟢 Sincronizado
-              </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <img src={IconeCalendario} alt="Ícone Calendario" style={{ width: '18px'}}/>
+                  <span style={{ fontSize: '12px', color: 'var(--earth-brown)' }}>
+                  Agenda Sincronizada
+                </span>
+                </div>
             )}
 
-            <button
-                className="btn"
-                style={{ backgroundColor: 'var(--white)', border: '2px solid var(--outline-light)', color: 'var(--earth-brown)' }}
-                onClick={() => setExibindoCesto(!exibindoCesto)}
-            >
-              {exibindoCesto ? 'Voltar ao Canteiro' : 'Ver Estufa'}
-            </button>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                  className="btn"
+                  style={{ backgroundColor: 'var(--white)', border: '2px solid var(--outline-light)', color: 'var(--earth-brown)' }}
+                  onClick={() => setExibindoCesto(!exibindoCesto)}
+              >
+                {exibindoCesto ? 'Voltar ao Canteiro' : 'Ver Estufa'}
+              </button>
 
-            <button className="btn btn-primario" onClick={() => setModalPlantarAberto(true)}>
-              Plantar
-            </button>
+              <button className="btn btn-primario" onClick={() => setModalPlantarAberto(true)}>
+                Plantar
+              </button>
+            </div>
+
           </div>
         </header>
 
