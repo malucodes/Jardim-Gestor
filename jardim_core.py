@@ -1,19 +1,23 @@
+import os
 import mysql.connector
 from mysql.connector import pooling
+from dotenv import load_dotenv
+
+# Carrega as variáveis do arquivo .env (quando rodando no seu PC)
+load_dotenv()
 
 pool_conexoes = pooling.MySQLConnectionPool(
     pool_name="jardim_pool",
     pool_size=5,
-    host = "gateway01.us-east-1.prod.aws.tidbcloud.com",
-    user = "2cgTasiDzWCDeZa.root",
-    password = "F3bL0r3Wp2xQNN3k",
-    port = 4000,
-    database = "test",
+    host=os.getenv("DB_HOST"),         # Puxa do cofre invisível!
+    user=os.getenv("DB_USER"),         # Puxa do cofre invisível!
+    password=os.getenv("DB_PASS"),
+    port=4000,
+    database="test",
     ssl_ca="",
     ssl_verify_cert=False,
     ssl_verify_identity=False
 )
-
 def conectar():
     return pool_conexoes.get_connection()
 
