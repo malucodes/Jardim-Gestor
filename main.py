@@ -3,17 +3,14 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
-
-# Importamos o seu motor limpo que criamos no passo anterior
 import jardim_core
 
 app = FastAPI(
     title="O Jardim - API",
-    description="Motor de gestão de atividades e canteiros metafóricos.",
-    version="1.0.0"
+    description="Motor de gestão de atividades e canteiros metafóricos rodando na Nuvem.",
+    version="2.0.0"
 )
 
-# Permitindo que sua futura interface (React, etc) converse com essa API
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,74 +19,54 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-ARQUIVO_BD = "jardim.json"
-
-# --- ESTRUTURAS DE DADOS (Como a interface envia dados para cá) ---
 class SementeNova(BaseModel):
     nome: str
+    descricao: Optional[str] = "Cuidando desta semente no jardim."
+    contexto: Optional[str] = "Geral"
+    dificuldade: Optional[str] = "Normal"
+    prazo: Optional[str] = "-"
 
 class SementeAtualizar(BaseModel):
     novo_nome: Optional[str] = None
-    novo_status: Optional[bool] = None
-
-# --- ROTAS DO JARDIM ---
+    regar: Optional[bool] = False
+    concluir: Optional[bool] = False
+    cesto: Optional[bool] = None
 
 @app.get("/canteiros")
 def contemplar_jardim():
-    """Retorna todas as sementes plantadas"""
-    canteiro = jardim_core.carregar_dados(ARQUIVO_BD)
+    # Puxa tudo direto do banco de dados na nuvem
+    canteiro = jardim_core.listar_projetos()
     return {"sementes": canteiro}
 
 @app.post("/plantar")
 def plantar_semente(semente: SementeNova):
-    """Adiciona uma nova semente ao solo"""
-    canteiro = jardim_core.carregar_dados(ARQUIVO_BD)
-
-    if jardim_core.buscar_projeto(canteiro, semente.nome):
+    if jardim_core.buscar_projeto(semente.nome):
         raise HTTPException(status_code=400, detail="Essa semente já está no solo!")
 
-    nova_semente = jardim_core.adicionar_projeto(canteiro, semente.nome)
-    jardim_core.salvar_dados(canteiro, ARQUIVO_BD)
-
-    return {"mensagem": f"Semente '{semente.nome}' plantada com sucesso!", "dados": nova_semente}
+    jardim_core.adicionar_projeto(
+        semente.nome, semente.descricao, semente.contexto, semente.dificuldade, semente.prazo
+    )
+    return {"mensagem": "Plantada na nuvem!"}
 
 @app.put("/cuidar/{nome_atual}")
 def cuidar_semente(nome_atual: str, dados: SementeAtualizar):
-    """Atualiza o status (regar) ou o nome de uma semente"""
-    canteiro = jardim_core.carregar_dados(ARQUIVO_BD)
-
-    sucesso = jardim_core.atualizar_projeto(
-        canteiro,
+    jardim_core.atualizar_projeto(
         nome_atual,
         novo_nome=dados.novo_nome,
-        novo_status=dados.novo_status
+        regar=dados.regar,
+        concluir=dados.concluir,
+        cesto=dados.cesto
     )
-
-    if not sucesso:
-        raise HTTPException(status_code=404, detail="Semente não encontrada no jardim.")
-
-    jardim_core.salvar_dados(canteiro, ARQUIVO_BD)
-    return {"mensagem": f"Semente '{nome_atual}' cuidada com sucesso!"}
+    return {"mensagem": "Cuidada com sucesso!"}
 
 @app.delete("/podar/{nome}")
 def podar_semente(nome: str):
-    """Remove uma semente (Colheita ou Poda)"""
-    canteiro = jardim_core.carregar_dados(ARQUIVO_BD)
-
-    sucesso = jardim_core.deletar_projeto(canteiro, nome)
-    if not sucesso:
-        raise HTTPException(status_code=404, detail="Semente não encontrada.")
-
-    jardim_core.salvar_dados(canteiro, ARQUIVO_BD)
+    jardim_core.deletar_projeto(nome)
     return {"mensagem": f"Semente '{nome}' podada com sucesso."}
 
-# --- O NOVO BOTÃO DE LIGAR ---
-# Substitui aquele antigo 'while True' e inicia o servidor web
 if __name__ == "__main__":
     print("=========================================================")
-    print("🌱 Preparando a terra... O Jardim está nascendo na Web!")
-    print("Para contemplar, acesse: http://localhost:8000/docs")
+    print("☁️ Conectando ao Banco de Dados na Nuvem...")
+    print("O Jardim está no ar em: http://localhost:8000/docs")
     print("=========================================================")
-
-    # Inicia o servidor uvicorn apontando para este próprio arquivo (main)
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

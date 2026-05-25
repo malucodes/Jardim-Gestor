@@ -1,59 +1,115 @@
-import datetime
-import json
+import mysql.connector
+from mysql.connector import pooling
 
-def carregar_dados(nome_arquivo):
+pool_conexoes = pooling.MySQLConnectionPool(
+    pool_name="jardim_pool",
+    pool_size=5,
+    host = "gateway01.us-east-1.prod.aws.tidbcloud.com",
+    user = "2cgTasiDzWCDeZa.root",
+    password = "F3bL0r3Wp2xQNN3k",
+    port = 4000,
+    database = "test",
+    ssl_ca="",
+    ssl_verify_cert=False,
+    ssl_verify_identity=False
+)
 
-    try:
-        with open(nome_arquivo, 'r', encoding='utf-8') as arquivo:
-            return json.load(arquivo)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
+def conectar():
+    return pool_conexoes.get_connection()
 
-def salvar_dados(lista_projetos, nome_arquivo):
-    with open(nome_arquivo, 'w', encoding='utf-8') as arquivo:
-        json.dump(lista_projetos, arquivo, indent=4, ensure_ascii=False)
+# =====================================================================
+# 2. FUNÇÕES DE MANIPULAÇÃO DO JARDIM (CRUD)
+# =====================================================================
+def listar_projetos():
+    db = conectar()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM sementes")
+    linhas = cursor.fetchall()
+    db.close()
 
-def buscar_projeto(lista_projetos, nome_busca):
-    for projeto in lista_projetos:
-        if projeto['nome'] == nome_busca:
-            return projeto
-    return None
+    sementes_formatadas = []
+    for linha in linhas:
+        sementes_formatadas.append({
+            "nome": linha["nome"],
+            "descricao": linha["descricao"],
+            "contexto": linha["contexto"],
+            "dificuldade": linha["dificuldade"],
+            "prazo": linha["prazo"],
+            "concluido": bool(linha["concluido"]),
+            "cesto": bool(linha["cesto"]),
+            "historico": ["Agua"] * linha["quantidade_regas"]
+        })
+    return sementes_formatadas
 
-def adicionar_projeto(lista_projetos, nome_projeto):
+def buscar_projeto(nome_projeto):
+    db = conectar()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM sementes WHERE nome = %s", (nome_projeto,))
+    projeto = cursor.fetchone()
+    db.close()
+    return projeto
 
-    novo_projeto = {
-        "nome": nome_projeto,
-        "concluido": False,
-        "historico": []
-    }
-    lista_projetos.append(novo_projeto)
-    return novo_projeto
+def adicionar_projeto(nome, descricao="", contexto="", dificuldade="", prazo=""):
+    db = conectar()
+    cursor = db.cursor()
+    sql = """INSERT INTO sementes (nome, descricao, contexto, dificuldade, prazo)
+             VALUES (%s, %s, %s, %s, %s)"""
+    valores = (nome, descricao, contexto, dificuldade, prazo)
+    cursor.execute(sql, valores)
+    db.commit()
+    db.close()
 
-def atualizar_projeto(lista_projetos, nome_busca, novo_nome=None, novo_status=None):
+def atualizar_projeto(nome_atual, novo_nome=None, regar=False, concluir=False, cesto=None):
+    db = conectar()
+    cursor = db.cursor()
 
-    projeto_encontrado = buscar_projeto(lista_projetos, nome_busca)
+    if novo_nome:
+        cursor.execute("UPDATE sementes SET nome = %s WHERE nome = %s", (novo_nome, nome_atual))
+        nome_atual = novo_nome
 
-    if not projeto_encontrado:
-        return False
+    if regar:
+        cursor.execute("UPDATE sementes SET quantidade_regas = quantidade_regas + 1 WHERE nome = %s", (nome_atual,))
 
-    nome_final = novo_nome if novo_nome is not None else projeto_encontrado['nome']
-    status_final = novo_status if novo_status is not None else projeto_encontrado['concluido']
+    if concluir:
+        cursor.execute("UPDATE sementes SET concluido = TRUE WHERE nome = %s", (nome_atual,))
 
-    data_mudanca = datetime.datetime.now().strftime("%d-%m-%Y")
+    if cesto is not None:
+        cursor.execute("UPDATE sementes SET cesto = %s WHERE nome = %s", (cesto, nome_atual))
 
-    if nome_final != projeto_encontrado['nome'] or status_final != projeto_encontrado['concluido']:
-        registro = (data_mudanca, status_final, nome_final)
-        projeto_encontrado['historico'].append(registro)
-
-    projeto_encontrado['nome'] = nome_final
-    projeto_encontrado['concluido'] = status_final
-
+    db.commit()
+    db.close()
     return True
 
-def deletar_projeto(lista_projetos, nome_busca):
-    projeto_encontrado = buscar_projeto(lista_projetos, nome_busca)
+def deletar_projeto(nome_projeto):
+    db = conectar()
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM sementes WHERE nome = %s", (nome_projeto,))
+    db.commit()
+    db.close()
+    return True
 
-    if projeto_encontrado:
-        lista_projetos.remove(projeto_encontrado)
-        return True
-    return False
+# =====================================================================
+# 3. INICIALIZAÇÃO AUTOMÁTICA DO BANCO DE DADOS
+# =====================================================================
+def inicializar_banco():
+    db = conectar()
+    cursor = db.cursor()
+    cursor.execute("""
+                   CREATE TABLE IF NOT EXISTS sementes (
+                                                           id INT AUTO_INCREMENT PRIMARY KEY,
+                                                           nome VARCHAR(255) NOT NULL,
+                       descricao TEXT,
+                       contexto VARCHAR(100),
+                       dificuldade VARCHAR(50),
+                       prazo VARCHAR(100),
+                       concluido BOOLEAN DEFAULT FALSE,
+                       cesto BOOLEAN DEFAULT FALSE,
+                       quantidade_regas INT DEFAULT 0
+                       );
+                   """)
+    db.commit()
+    db.close()
+    print("🌱 Terreno do banco de dados e Pool de Conexões preparados com sucesso!")
+
+# Executa a verificação assim que o servidor liga
+inicializar_banco()

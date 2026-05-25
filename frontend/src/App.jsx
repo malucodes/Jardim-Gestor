@@ -1,122 +1,203 @@
-import { useState, useEffect } from 'react'
-import './App.css'
+import { useState, useEffect } from 'react';
+import IconeMascotePadrao from './assets/mascote_padrao.svg';
+import IconeMascotePlantar from './assets/mascote_nova_tarefa.svg';
+import IconeMascoteRegar from './assets/mascote_atualizar.svg';
+import IconeMascoteColher from './assets/mascote_concluidas.svg';
+import IconeMascotePodar from './assets/mascote_deletar.svg';
+import IconeCerca from './assets/cercas.svg'
+import IconeEstufa from './assets/estufa.svg'
+
+import CardPlanta from './CardPlanta';
+import FormularioPlantar from './FormularioPlantar';
+import FormularioCuidar from './FormularioCuidar';
+import FormularioPodar from './FormularioPodar';
+import ConfirmacaoExclusaoModal from './ConfirmacaoExclusaoModal';
+import './App.css';
 
 function App() {
-  const [sementes, setSementes] = useState([])
-  const [nomeNovaSemente, setNomeNovaSemente] = useState('')
+  const [sementes, setSementes] = useState([]);
+  const [exibindoCesto, setExibindoCesto] = useState(false);
+  const [modalPlantarAberto, setModalPlantarAberto] = useState(false);
+  const [modalRegaAberto, setModalRegaAberto] = useState(false);
+  const [modalPodarAberto, setModalPodarAberto] = useState(false);
+  const [modalExclusaoCestoAberto, setModalExclusaoCestoAberto] = useState(false);
+  const [sementeSelecionada, setSementeSelecionada] = useState("");
+  const [mascoteAtual, setMascoteAtual] = useState(IconeMascotePadrao);
+
+  const reagirMascote = (imagemAcao) => {
+    setMascoteAtual(imagemAcao);
+    setTimeout(() => { setMascoteAtual(IconeMascotePadrao); }, 100000);
+  };
 
   const carregarJardim = async () => {
-    try {
-      const resposta = await fetch('http://localhost:8000/canteiros')
-      const dados = await resposta.json()
-      setSementes(dados.sementes)
-    } catch (erro) {
-      console.error("Erro ao conectar com a API:", erro)
+    const resposta = await fetch('http://localhost:8000/canteiros');
+    const dados = await resposta.json();
+    setSementes(dados.sementes);
+  };
+
+  useEffect(() => { carregarJardim(); }, []);
+
+  const lidarComNovoPlantio = async (dadosSemente) => {
+    const resposta = await fetch('http://localhost:8000/plantar', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dadosSemente)
+    });
+    if (!resposta.ok) { alert("Semente já existe ou erro de formato!"); return; }
+    setModalPlantarAberto(false);
+    carregarJardim();
+    reagirMascote(IconeMascotePlantar);
+  };
+
+  const abrirModalRega = (nomeSemente) => {
+    setSementeSelecionada(nomeSemente);
+    setModalRegaAberto(true);
+  };
+
+  const confirmarRega = async (nomeAntigo, novoNome) => {
+    await fetch(`http://localhost:8000/cuidar/${encodeURIComponent(nomeAntigo)}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ novo_nome: novoNome, regar: true })
+    });
+    setModalRegaAberto(false);
+    carregarJardim();
+    reagirMascote(IconeMascoteRegar);
+  };
+
+  const lidarComColheita = async (nomeSemente) => {
+    await fetch(`http://localhost:8000/cuidar/${encodeURIComponent(nomeSemente)}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ concluir: true })
+    });
+    carregarJardim();
+    reagirMascote(IconeMascoteColher);
+  };
+
+  const abrirModalPoda = (nome) => {
+    setSementeSelecionada(nome);
+    if (exibindoCesto) {
+      setModalExclusaoCestoAberto(true);
+    } else {
+      setModalPodarAberto(true);
     }
-  }
+  };
 
-  const plantarSemente = async (evento) => {
-    evento.preventDefault()
-    if (!nomeNovaSemente.trim()) return
-
+  const confirmarExclusaoPermanenteCesto = async () => {
     try {
-      await fetch('http://localhost:8000/plantar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome: nomeNovaSemente })
-      })
-      setNomeNovaSemente('')
-      carregarJardim()
-    } catch (erro) {
-      console.error("Erro ao plantar:", erro)
-    }
-  }
-
-  // NOVA FUNÇÃO: Atualizar o status (Regar)
-  const regarSemente = async (nome, statusAtual) => {
-    try {
-      // O encodeURIComponent garante que nomes com espaço (ex: "Estudar Python") funcionem na URL
-      await fetch(`http://localhost:8000/cuidar/${encodeURIComponent(nome)}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        // Inverte o status atual: se era false (não concluído), vira true, e vice-versa
-        body: JSON.stringify({ novo_status: !statusAtual })
-      })
-      carregarJardim() // Recarrega para mostrar a florzinha!
-    } catch (erro) {
-      console.error("Erro ao regar:", erro)
-    }
-  }
-
-  // NOVA FUNÇÃO: Deletar (Podar)
-  const podarSemente = async (nome) => {
-    try {
-      await fetch(`http://localhost:8000/podar/${encodeURIComponent(nome)}`, {
+      await fetch(`http://localhost:8000/podar/${encodeURIComponent(sementeSelecionada)}`, {
         method: 'DELETE'
-      })
-      carregarJardim() // Recarrega para remover da tela
+      });
+      setModalExclusaoCestoAberto(false);
+      carregarJardim();
+      reagirMascote(IconeMascotePodar);
     } catch (erro) {
-      console.error("Erro ao podar:", erro)
+      console.error("Erro ao deletar permanentemente do cesto:", erro);
     }
-  }
+  };
 
-  useEffect(() => {
-    carregarJardim()
-  }, [])
+  const confirmarPoda = async (acao) => {
+    if (acao === 'descartar') {
+      await fetch(`http://localhost:8000/podar/${encodeURIComponent(sementeSelecionada)}`, { method: 'DELETE' });
+      reagirMascote(IconeMascotePodar);
+    } else if (acao === 'guardar') {
+      await fetch(`http://localhost:8000/cuidar/${encodeURIComponent(sementeSelecionada)}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cesto: true })
+      });
+      reagirMascote(IconeMascoteColher);
+    }
+
+    setModalPodarAberto(false);
+    carregarJardim();
+  };
+
+  const tarefasVisiveis = sementes.filter(s => exibindoCesto ? s.cesto : !s.cesto);
 
   return (
-      <div className="jardim-container">
-        <header>
-          <h1>✨ Meu Jardim Virtual 🎀</h1>
-          <p>Cultivando minha rotina, uma semente de cada vez.</p>
+      <div className="dashboard-container">
+
+        <header className="box-painel header-jardim">
+          <div className="header-conteudo">
+            <img src={mascoteAtual} alt="Ícone Mascote" style={{ width: '8em', transition: 'all 0.3s ease' }} />
+            <div className="header-textos">
+              <h1>Meu Jardim</h1>
+              <p>Bom dia, Jardineiro. O solo está fértil hoje!</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button
+                className="btn"
+                style={{ backgroundColor: 'var(--white)', border: '2px solid var(--outline-light)', color: 'var(--earth-brown)' }}
+                onClick={() => setExibindoCesto(!exibindoCesto)}
+            >
+              {exibindoCesto ? 'Voltar ao Canteiro' : 'Ver Estufa'}
+            </button>
+
+            <button className="btn btn-primario" onClick={() => setModalPlantarAberto(true)}>
+              Plantar
+            </button>
+          </div>
         </header>
 
-        <form onSubmit={plantarSemente} className="formulario-plantio">
-          <input
-              type="text"
-              className="input-semente"
-              placeholder="O que vamos cultivar hoje?..."
-              value={nomeNovaSemente}
-              onChange={(e) => setNomeNovaSemente(e.target.value)}
-          />
-          <button type="submit" className="btn-plantar">
-            Plantar 🌷
-          </button>
-        </form>
+        <main className="box-painel">
+          <div className="canteiro-top">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <img
+                  src={exibindoCesto ? IconeEstufa : IconeCerca}
+                  alt="Ícone da Seção"
+                  style={{ width: '2.5em' }}
+              />
+              <h2>{exibindoCesto ? 'Estufa de Histórico' : 'Canteiro Principal'}</h2>
+            </div>
+            <span className="canteiro-contador">
+              {tarefasVisiveis.length} {tarefasVisiveis.length === 1 ? 'Tarefa' : 'Tarefas'}
+            </span>
+          </div>
 
-        <main className="canteiro">
-          {sementes.length === 0 ? (
-              <p className="aviso">O solo está livre! Que tal plantar a primeira semente?</p>
-          ) : (
-              sementes.map((semente, index) => (
-                  <div key={index} className={`card-semente ${semente.concluido ? 'floresceu' : ''}`}>
-                    <h2>{semente.nome}</h2>
-                    <div className="status-badge">
-                      {semente.concluido ? '🌸 Floresceu' : '🌿 Crescendo'}
-                    </div>
+          <div className="grid-cards">
+            {tarefasVisiveis.map((semente, index) => (
+                <CardPlanta
+                    key={index}
+                    titulo={semente.nome}
+                    descricao={semente.descricao}
+                    contexto={semente.contexto}
+                    dificuldade={semente.dificuldade}
+                    prazo={semente.prazo}
+                    concluido={semente.concluido}
+                    historico={semente.historico}
+                    isCesto={exibindoCesto}
+                    onRegar={abrirModalRega}
+                    onColher={lidarComColheita}
+                    onPodar={abrirModalPoda}
+                />
+            ))}
 
-                    {/* NOVOS BOTÕES: Ações de cada planta */}
-                    <div className="acoes-card">
-                      <button
-                          onClick={() => regarSemente(semente.nome, semente.concluido)}
-                          className="btn-regar"
-                      >
-                        {semente.concluido ? 'Desfazer 🔄' : 'Regar 💧'}
-                      </button>
-
-                      <button
-                          onClick={() => podarSemente(semente.nome)}
-                          className="btn-podar"
-                      >
-                        Podar ✂️
-                      </button>
-                    </div>
-                  </div>
-              ))
-          )}
+            {tarefasVisiveis.length === 0 && (
+                <p style={{ color: 'var(--outline)', fontStyle: 'italic', gridColumn: '1 / -1', textAlign: 'center', padding: '32px' }}>
+                  {exibindoCesto ? 'Seu cesto está vazio.' : 'O canteiro está vazio. Plante uma semente!'}
+                </p>
+            )}
+          </div>
         </main>
+
+        {modalPlantarAberto && (
+            <FormularioPlantar onPlantar={lidarComNovoPlantio} onFechar={() => setModalPlantarAberto(false)} />
+        )}
+
+        {modalRegaAberto && (
+            <FormularioCuidar sementeAtual={sementeSelecionada} onSalvar={confirmarRega} onFechar={() => setModalRegaAberto(false)} />
+        )}
+
+        {modalPodarAberto && (
+            <FormularioPodar sementeAtual={sementeSelecionada} onConfirmar={confirmarPoda} onFechar={() => setModalPodarAberto(false)} />
+        )}
+
+        {modalExclusaoCestoAberto && (
+            <ConfirmacaoExclusaoModal
+                nomeSemente={sementeSelecionada}
+                onConfirmar={confirmarExclusaoPermanenteCesto}
+                onFechar={() => setModalExclusaoCestoAberto(false)}
+            />
+        )}
+
       </div>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,48 +1,430 @@
-/* Efeito especial para quando a planta é concluída */
-.card-semente.floresceu {
-  border-color: #ffb3c6;
-  background-color: #fffafb;
+/* ===============================
+   LAYOUT PRINCIPAL (DASHBOARD)
+=============================== */
+.dashboard-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-md);
 }
 
-.card-semente.floresceu h2 {
-  color: #ff8fab;
-  text-decoration: line-through;
+.box-painel {
+  background-color: var(--surface-low);
+  border: var(--border-thick) solid var(--outline-light);
+  border-radius: var(--radius-md);
+  padding: 32px;
+}
+
+/* ===============================
+   HEADER DO JARDIM
+=============================== */
+.header-jardim {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-conteudo {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.header-textos h1 {
+  font-size: 32px;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.header-textos p {
+  color: var(--muted-green);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* ===============================
+   CANTEIRO PRINCIPAL (MAIN)
+=============================== */
+.canteiro-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--stack-lg);
+}
+
+.canteiro-top h2 {
+  font-size: 24px;
+}
+
+.canteiro-contador {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--outline);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--stack-md);
+}
+
+/* ===============================
+   CARD DA PLANTA (LAYOUT NOVO)
+=============================== */
+.card-planta {
+  background-color: var(--white);
+  border: var(--border-thick) solid var(--outline-light);
+  border-radius: var(--radius-md);
+  padding: var(--card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.card-header-horizontal {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-icone-quadrado {
+  width: 56px;
+  height: 56px;
+  background-color: var(--pale-mint);
+  border: var(--border-thick) solid var(--outline-light);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-textos-header h2 {
+  font-family: var(--font-titulo);
+  font-size: 20px;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.card-textos-header p {
+  font-size: 13px;
+  color: var(--muted-green);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.card-acoes-nova {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  width: 100%;
+}
+
+.card-acoes-nova .btn {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.btn-perigo.btn-icon-only {
+  padding: 8px 12px;
+}
+
+.btn-icon-only {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===============================
+   BOTÕES - Efeito Bevel Tátil
+=============================== */
+.btn {
+  font-family: var(--font-corpo);
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.btn-primario {
+  background-color: var(--leaf-green);
+  color: var(--white);
+  border: var(--border-thick) solid var(--earth-brown);
+  box-shadow: 0px 4px 0px var(--deep-green);
+}
+.btn-primario:active {
+  transform: translateY(4px);
+  box-shadow: 0px 0px 0px var(--deep-green);
+}
+
+.btn-secundario {
+  background-color: var(--mint-green);
+  color: var(--leaf-green);
+  border: var(--border-thick) solid var(--leaf-green);
+  box-shadow: 0px 4px 0px var(--dark-green);
+}
+.btn-secundario:active {
+  transform: translateY(4px);
+  box-shadow: 0px 0px 0px var(--dark-green);
+}
+
+.btn-perigo {
+  background-color: var(--white);
+  border: var(--border-thick) solid var(--floral-coral);
+  box-shadow: 0px 4px 0px var(--floral-coral);
+}
+
+.btn-perigo:active {
+  transform: translateY(4px);
+  box-shadow: 0px 0px 0px var(--floral-coral);
+}
+
+/* ===============================
+   ETIQUETAS E BARRAS
+=============================== */
+.chips-container {
+  display: flex;
+  gap: var(--stack-sm);
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.chip-status {
+  background-color: var(--surface);
+  color: var(--earth-brown);
+  border-color: var(--outline);
+}
+
+.chip-dificuldade {
+  background-color: var(--pale-mint);
+  color: var(--leaf-green);
+  border-color: var(--leaf-green);
+}
+
+.progresso-container { width: 100%; }
+
+.progresso-cocho {
+  width: 100%;
+  height: 12px;
+  background-color: var(--surface);
+  border: var(--border-thick) solid var(--earth-brown);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.progresso-preenchimento {
+  height: 100%;
+  background-color: var(--leaf-green);
+  border-right: var(--border-thick) solid var(--earth-brown);
+  transition: width 0.3s ease;
+}
+
+.progresso-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.progresso-texto {
+  color: var(--earth-brown);
+  font-family: var(--font-corpo);
+}
+
+.progresso-valor {
+  color: var(--leaf-green);
+  font-family: var(--font-corpo);
+}
+
+/* ===============================
+   MODAL DE PLANTIO (JANELA FLUTUANTE)
+=============================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(25, 28, 25, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--white);
+  border: var(--border-thick) solid var(--outline-light);
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: abrirModal 0.2s ease-out;
+}
+
+@keyframes abrirModal {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--card-padding);
+  border-bottom: 1px solid var(--outline-light);
+}
+
+.modal-header h2 {
+  font-size: 20px;
+  color: var(--leaf-green);
+}
+
+.btn-fechar-modal {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--outline);
+}
+
+.modal-body {
+  padding: var(--card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-md);
+}
+
+.modal-footer {
+  padding: var(--card-padding);
+  background-color: var(--surface-low);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--stack-sm);
+  border-top: 1px solid var(--outline-light);
+}
+
+.modal-avatar-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--stack-sm);
+}
+
+.avatar-pontilhado {
+  width: 80px;
+  height: 80px;
+  border: 2px dashed var(--outline-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chip-perigo {
+  background-color: var(--coral-bloom);
+  color: var(--floral-coral);
+  border-color: var(--floral-coral);
+}
+
+.chip.chip-ativo {
+  box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--mint-green);
+  transform: translateY(-2px);
+  font-weight: 600;
+  opacity: 1;
+}
+
+.chips-container:has(.chip-ativo) .chip:not(.chip-ativo) {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+.modal-body::-webkit-scrollbar-track {
+  background: var(--surface-low);
+  border-radius: 8px;
+}
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--outline-light);
+  border-radius: 8px;
+}
+
+/* ===============================
+   CAMPOS - OS SULCOS (FORMULÁRIO)
+=============================== */
+.grupo-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: var(--stack-md);
+  text-align: left;
+}
+
+.grupo-campo label {
+  font-family: var(--font-corpo);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--earth-brown);
+}
+
+.campo-input, .campo-textarea {
+  font-family: var(--font-corpo);
+  font-size: 16px;
+  padding: 14px 16px;
+  background-color: var(--surface-low);
+  border: 2px solid var(--outline-light);
+  border-radius: var(--radius-sm);
+  color: var(--earth-brown);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box; /* Impede que o input vaze do modal */
+  transition: all 0.2s ease-in-out;
+}
+
+.campo-input::placeholder, .campo-textarea::placeholder {
+  color: var(--outline);
   opacity: 0.7;
 }
 
-/* Área dos novos botões de ação */
-.acoes-card {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-  margin-top: 10px;
+.campo-input:focus, .campo-textarea:focus {
+  border-color: var(--leaf-green);
+  box-shadow: 0 0 0 4px var(--mint-green);
+  background-color: var(--white);
 }
 
-.btn-regar, .btn-podar {
-  flex: 1;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-regar {
-  background-color: #e6f4ea;
-  color: #2f855a;
-}
-
-.btn-regar:hover {
-  background-color: #c6f6d5;
-}
-
-.btn-podar {
-  background-color: #fee2e2;
-  color: #e53e3e;
-}
-
-.btn-podar:hover {
-  background-color: #fecaca;
+.campo-textarea {
+  resize: vertical;
+  min-height: 80px;
 }
