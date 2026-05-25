@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useGoogleLogin } from '@react-oauth/google';
 import IconeMascotePadrao from './assets/mascote_padrao.svg';
 import IconeMascotePlantar from './assets/mascote_nova_tarefa.svg';
 import IconeMascoteRegar from './assets/mascote_atualizar.svg';
@@ -23,6 +24,18 @@ function App() {
   const [modalExclusaoCestoAberto, setModalExclusaoCestoAberto] = useState(false);
   const [sementeSelecionada, setSementeSelecionada] = useState("");
   const [mascoteAtual, setMascoteAtual] = useState(IconeMascotePadrao);
+
+  // 2. Criamos o estado e a função do Google aqui dentro do App
+  const [googleToken, setGoogleToken] = useState(null);
+
+  const conectarGoogle = useGoogleLogin({
+    scope: 'https://www.googleapis.com/auth/calendar.events',
+    onSuccess: (tokenResponse) => {
+      setGoogleToken(tokenResponse.access_token);
+      alert("Agenda conectada com sucesso! 🌿");
+    },
+    onError: (error) => console.log('Erro ao conectar:', error),
+  });
 
   const reagirMascote = (imagemAcao) => {
     setMascoteAtual(imagemAcao);
@@ -120,7 +133,22 @@ function App() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+
+            {!googleToken ? (
+                <button
+                    className="btn"
+                    style={{ backgroundColor: 'transparent', border: '2px solid #4285F4', color: '#4285F4' }}
+                    onClick={() => conectarGoogle()}
+                >
+                  📅 Conectar Agenda
+                </button>
+            ) : (
+                <span style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--earth-brown)', display: 'flex', alignItems: 'center', padding: '0 12px' }}>
+                🟢 Sincronizado
+              </span>
+            )}
+
             <button
                 className="btn"
                 style={{ backgroundColor: 'var(--white)', border: '2px solid var(--outline-light)', color: 'var(--earth-brown)' }}
@@ -177,7 +205,11 @@ function App() {
         </main>
 
         {modalPlantarAberto && (
-            <FormularioPlantar onPlantar={lidarComNovoPlantio} onFechar={() => setModalPlantarAberto(false)} />
+            <FormularioPlantar
+                onPlantar={lidarComNovoPlantio}
+                onFechar={() => setModalPlantarAberto(false)}
+                googleToken={googleToken}
+            />
         )}
 
         {modalRegaAberto && (

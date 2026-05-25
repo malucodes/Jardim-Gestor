@@ -3,14 +3,13 @@ import mysql.connector
 from mysql.connector import pooling
 from dotenv import load_dotenv
 
-# Carrega as variáveis do arquivo .env (quando rodando no seu PC)
 load_dotenv()
 
 pool_conexoes = pooling.MySQLConnectionPool(
     pool_name="jardim_pool",
     pool_size=5,
-    host=os.getenv("DB_HOST"),         # Puxa do cofre invisível!
-    user=os.getenv("DB_USER"),         # Puxa do cofre invisível!
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
     password=os.getenv("DB_PASS"),
     port=4000,
     database="test",

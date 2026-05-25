@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import IconeBroto from './assets/broto_em_andamento.svg'
 import './App.css';
 
-export default function FormularioPlantar({ onPlantar, onFechar }) {
+export default function FormularioPlantar({ onPlantar, onFechar, googleToken }) {
     const [nome, setNome] = useState('');
     const [descricao, setDescricao] = useState('');
     const [prazo, setPrazo] = useState('');
@@ -23,7 +23,8 @@ export default function FormularioPlantar({ onPlantar, onFechar }) {
             prazo,
             notas,
             contexto: contextoSelecionado,
-            dificuldade: dificuldadeSelecionada
+            dificuldade: dificuldadeSelecionada,
+            google_token: googleToken
         });
 
         setNome('');
@@ -42,6 +43,7 @@ export default function FormularioPlantar({ onPlantar, onFechar }) {
 
         return selecionado ? `${classeBase} chip-ativo` : classeBase;
     };
+
 
     return (
         <div className="modal-overlay">

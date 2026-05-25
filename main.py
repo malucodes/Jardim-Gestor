@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
+import requests
 import jardim_core
 
 app = FastAPI(
@@ -15,7 +16,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://jardim-digital-six.vercel.app"
+        "https://ciberjardim.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -28,6 +29,7 @@ class SementeNova(BaseModel):
     contexto: Optional[str] = "Geral"
     dificuldade: Optional[str] = "Normal"
     prazo: Optional[str] = "-"
+    google_token: Optional[str] = None
 
 class SementeAtualizar(BaseModel):
     novo_nome: Optional[str] = None
@@ -48,6 +50,38 @@ def plantar_semente(semente: SementeNova):
     jardim_core.adicionar_projeto(
         semente.nome, semente.descricao, semente.contexto, semente.dificuldade, semente.prazo
     )
+
+    if semente.google_token and semente.prazo and semente.prazo != "-":
+        url_google = "https://www.googleapis.com/calendar/v3/calendars/primary/events"
+
+        headers = {
+            "Authorization": f"Bearer {semente.google_token}",
+            "Content-Type": "application/json"
+        }
+
+        dados_evento = {
+            "summary": semente.nome,
+            "description": semente.descricao,
+            "start": {
+                "date": semente.prazo
+            },
+            "end": {
+                "date": semente.prazo
+            }
+        }
+
+        try:
+            resposta_google = requests.post(url_google, headers=headers, json=dados_evento, timeout=5)
+
+            if resposta_google.status_code == 200:
+                print("✅ Evento criado com sucesso no Google Calendar!")
+            else:
+                print(f"⚠️ Erro do Google: {resposta_google.text}")
+
+        except Exception as e:
+            print(f"Erro de conexão com o Google: {e}")
+    # ---------------------------------------------------------
+
     return {"mensagem": "Plantada na nuvem!"}
 
 @app.put("/cuidar/{nome_atual}")
