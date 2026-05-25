@@ -53,7 +53,7 @@ function App() {
   };
 
   const confirmarRega = async (nomeAntigo, novoNome) => {
-    await fetch(`http://localhost:8000/cuidar/${encodeURIComponent(nomeAntigo)}`, {
+    await fetch(`https://api-jardim.onrender.com/cuidar/${encodeURIComponent(nomeAntigo)}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ novo_nome: novoNome, regar: true })
     });
     setModalRegaAberto(false);
@@ -62,7 +62,7 @@ function App() {
   };
 
   const lidarComColheita = async (nomeSemente) => {
-    await fetch(`http://localhost:8000/cuidar/${encodeURIComponent(nomeSemente)}`, {
+    await fetch(`https://api-jardim.onrender.com/cuidar/${encodeURIComponent(nomeSemente)}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ concluir: true })
     });
     carregarJardim();
@@ -80,7 +80,7 @@ function App() {
 
   const confirmarExclusaoPermanenteCesto = async () => {
     try {
-      await fetch(`http://localhost:8000/podar/${encodeURIComponent(sementeSelecionada)}`, {
+      await fetch(`https://api-jardim.onrender.com/podar/${encodeURIComponent(sementeSelecionada)}`, {
         method: 'DELETE'
       });
       setModalExclusaoCestoAberto(false);
@@ -93,10 +93,10 @@ function App() {
 
   const confirmarPoda = async (acao) => {
     if (acao === 'descartar') {
-      await fetch(`http://localhost:8000/podar/${encodeURIComponent(sementeSelecionada)}`, { method: 'DELETE' });
+      await fetch(`https://api-jardim.onrender.com/podar/${encodeURIComponent(sementeSelecionada)}`, { method: 'DELETE' });
       reagirMascote(IconeMascotePodar);
     } else if (acao === 'guardar') {
-      await fetch(`http://localhost:8000/cuidar/${encodeURIComponent(sementeSelecionada)}`, {
+      await fetch(`https://api-jardim.onrender.com/cuidar/${encodeURIComponent(sementeSelecionada)}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cesto: true })
       });
       reagirMascote(IconeMascoteColher);
