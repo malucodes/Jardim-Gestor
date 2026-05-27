@@ -45,6 +45,9 @@ def contemplar_jardim():
 
 @app.post("/plantar")
 def plantar_semente(semente: SementeNova):
+    # 1. O ESPIÃO: Veja o que o React está mandando!
+    print(f"🕵️ DEBUG - O prazo que chegou do site foi: '{semente.prazo}'")
+
     if jardim_core.buscar_projeto(semente.nome):
         raise HTTPException(status_code=400, detail="Essa semente já está no solo!")
 
