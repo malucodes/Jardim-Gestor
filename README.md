@@ -18,7 +18,7 @@ A interface gamificada permite que você acompanhe o crescimento das suas metas:
 * ⊹ Colher & Podar (Concluir/Deletar): Guarde seus projetos finalizados na Estufa de Histórico ou faça a poda definitiva de ideias que não seguirão em frente.
 
 
-## Integração com Google Tasks
+## ✲ Integração com Google Tasks
 
 O Ciberjardim não vive isolado. Ele possui uma integração direta e rigorosa com a API do Google Tasks:
 
