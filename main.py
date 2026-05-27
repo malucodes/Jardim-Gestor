@@ -1,4 +1,5 @@
 import uvicorn
+from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -59,24 +60,33 @@ def plantar_semente(semente: SementeNova):
             "Content-Type": "application/json"
         }
 
-        data_formatada = f"{semente.prazo.strip()}T00:00:00.000Z"
+        data_formatada = None
+        try:
+            data_obj = datetime.strptime(semente.prazo.strip(), "%Y-%m-%d")
+            data_formatada = data_obj.strftime("%Y-%m-%dT00:00:00.000Z")
+        except ValueError:
+            print(f"⚠️ A data '{semente.prazo}' não veio no formato AAAA-MM-DD. Prazo ignorado.")
 
         dados_tarefa = {
             "title": semente.nome,
-            "notes": semente.descricao,
-            "due": data_formatada
-}
+            "notes": semente.descricao
+        }
+
+        if data_formatada:
+            dados_tarefa["due"] = data_formatada
 
         try:
             resposta_google = requests.post(url_google, headers=headers, json=dados_tarefa, timeout=5)
 
-            if resposta_google.status_code == 200:
-                print("✅ Tarefa criada com sucesso no Google Tasks!")
+            if resposta_google.status_code in [200, 201]:
+                id_tarefa = resposta_google.json().get("id")
+                print(f"✅ Tarefa criada com sucesso! ID no Google: {id_tarefa}")
             else:
                 print(f"⚠️ Erro do Google: {resposta_google.text}")
 
         except Exception as e:
             print(f"Erro de conexão com o Google: {e}")
+    # ---------------------------------------------------------
 
     return {"mensagem": "Plantada na nuvem!"}
 
