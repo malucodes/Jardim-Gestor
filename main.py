@@ -51,6 +51,7 @@ def plantar_semente(semente: SementeNova):
         semente.nome, semente.descricao, semente.contexto, semente.dificuldade, semente.prazo
     )
 
+    # --- NOVA PARTE: Disparo DIRETO para o Google Tasks ---
     if semente.google_token and semente.prazo and semente.prazo != "-":
         url_google = "https://tasks.googleapis.com/tasks/v1/lists/@default/tasks"
 
@@ -59,7 +60,8 @@ def plantar_semente(semente: SementeNova):
             "Content-Type": "application/json"
         }
 
-        data_formatada = f"{semente.prazo}T12:00:00.000Z"
+        # CORREÇÃO: O Google Tasks exige estritamente meia-noite UTC (T00:00:00.000Z)
+        data_formatada = f"{semente.prazo}T00:00:00.000Z"
 
         dados_tarefa = {
             "title": semente.nome,
@@ -77,7 +79,6 @@ def plantar_semente(semente: SementeNova):
 
         except Exception as e:
             print(f"Erro de conexão com o Google: {e}")
-    # ---------------------------------------------------------
 
     return {"mensagem": "Plantada na nuvem!"}
 
