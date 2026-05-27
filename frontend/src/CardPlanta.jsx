@@ -32,12 +32,20 @@ export default function CardPlanta({
     let estagioSub = "Escrevendo";
     let iconeFase = IconeSemente;
 
+    // --- NOVA LÓGICA DE MATURIDADE ---
     if (concluido) {
         progresso = 100;
         estagioNome = "Colheita";
         estagioSub = "Concluída!";
         iconeFase = IconeColheita;
-    } else if (quantidadeRegas >= 3) {
+    } else if (quantidadeRegas >= 4) {
+        // Atingiu 100% de regas: Pronta para colher!
+        progresso = 100;
+        estagioNome = "Madura";
+        estagioSub = "Pronta para colher";
+        iconeFase = IconeArvore;
+    } else if (quantidadeRegas === 3) {
+        // Estágio de 85%: O botão de regar ainda aparece aqui
         progresso = 85;
         estagioNome = "Árvore";
         estagioSub = "Quase pronta";
@@ -98,14 +106,17 @@ export default function CardPlanta({
                     </button>
                 ) : (
                     <>
-                        <button
-                            className="btn btn-secundario"
-                            style={{ flex: 1, opacity: concluido ? 0.5 : 1, pointerEvents: concluido ? 'none' : 'auto' }}
-                            onClick={() => onRegar(titulo)}
-                        >
-                            <img src={IconeRegaDrop} alt="" style={{ width: '16px' }} />
-                            REGAR
-                        </button>
+                        {/* MAGIA AQUI: O botão Regar só é desenhado na tela se o progresso for menor que 100 */}
+                        {progresso < 100 && (
+                            <button
+                                className="btn btn-secundario"
+                                style={{ flex: 1, opacity: concluido ? 0.5 : 1, pointerEvents: concluido ? 'none' : 'auto' }}
+                                onClick={() => onRegar(titulo)}
+                            >
+                                <img src={IconeRegaDrop} alt="" style={{ width: '16px' }} />
+                                REGAR
+                            </button>
+                        )}
 
                         <button
                             className="btn btn-primario"
