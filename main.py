@@ -45,9 +45,6 @@ def contemplar_jardim():
 
 @app.post("/plantar")
 def plantar_semente(semente: SementeNova):
-    # 1. O ESPIÃO: Veja o que o React está mandando!
-    print(f"🕵️ DEBUG - O prazo que chegou do site foi: '{semente.prazo}'")
-
     if jardim_core.buscar_projeto(semente.nome):
         raise HTTPException(status_code=400, detail="Essa semente já está no solo!")
 
@@ -55,6 +52,7 @@ def plantar_semente(semente: SementeNova):
         semente.nome, semente.descricao, semente.contexto, semente.dificuldade, semente.prazo
     )
 
+    # --- INTEGRAÇÃO DIRETA COM GOOGLE TASKS ---
     if semente.google_token and semente.prazo and semente.prazo != "-":
         url_google = "https://tasks.googleapis.com/tasks/v1/lists/@default/tasks"
 
@@ -63,33 +61,19 @@ def plantar_semente(semente: SementeNova):
             "Content-Type": "application/json"
         }
 
-        data_formatada = None
-        try:
-            data_obj = datetime.strptime(semente.prazo.strip(), "%Y-%m-%d")
-            data_formatada = data_obj.strftime("%Y-%m-%dT00:00:00.000Z")
-        except ValueError:
-            print(f"⚠️ A data '{semente.prazo}' não veio no formato AAAA-MM-DD. Prazo ignorado.")
+        # Junta a data do formulário (AAAA-MM-DD) com o formato de hora exigido pelo Google
+        prazo_final = f"{semente.prazo.strip()}T00:00:00Z"
 
         dados_tarefa = {
             "title": semente.nome,
-            "notes": semente.descricao
+            "notes": semente.descricao,
+            "due": prazo_final  # Este campo define o prazo de conclusão no Google
         }
 
-        if data_formatada:
-            dados_tarefa["due"] = data_formatada
-
         try:
-            resposta_google = requests.post(url_google, headers=headers, json=dados_tarefa, timeout=5)
-
-            if resposta_google.status_code in [200, 201]:
-                id_tarefa = resposta_google.json().get("id")
-                print(f"✅ Tarefa criada com sucesso! ID no Google: {id_tarefa}")
-            else:
-                print(f"⚠️ Erro do Google: {resposta_google.text}")
-
+            requests.post(url_google, headers=headers, json=dados_tarefa, timeout=5)
         except Exception as e:
-            print(f"Erro de conexão com o Google: {e}")
-    # ---------------------------------------------------------
+            print(f"Erro ao enviar para o Google: {e}")
 
     return {"mensagem": "Plantada na nuvem!"}
 
