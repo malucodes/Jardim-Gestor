@@ -2,18 +2,7 @@
 
 > "Nem toda semente brota no mesmo dia."
 
-```text
-                  _(_)_                          wWWWw   _
-      @@@@       (_)@(_)   vVVVv     _     @@@@  (___) _(_)_
-     @@()@@ wWWWw  (_)\    (___)   _(_)_  @@()@@   Y  (_)@(_)
-      @@@@  (___)     `|/    Y    (_)@(_)  @@@@   \|/   (_)\
-       /      Y       \|    \|/    /(_)    \|      |/      |
-    \ |     \ |/       | / \ | /  \|/       |/    \|      \|/
-    \\|//   \\|///  \\\|//\\\|/// \|///  \\\|//  \\|//  \\\|//
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  
-```
-
-O **Jardim** é um gestor de atividades e projetos de linha de comando (CLI) escrito em Python que transforma a organização da sua rotina em uma experiência lúdica, relaxante e metafórica.
+O **Ciberjardim** é uma aplicação web Full-Stack que transforma a gestão de tarefas e projetos em uma experiência lúdica, visual e relaxante.
 
 Neste aplicativo, você não lida com simples "tarefas a fazer" em uma lista fria e estressante. O seu espaço de trabalho é um jardim virtual, e **cada atividade ou projeto é uma semente**. Ao adicionar uma nova tarefa, você está, na verdade, plantando uma semente na terra. 
 
@@ -21,21 +10,25 @@ Neste aplicativo, você não lida com simples "tarefas a fazer" em uma lista fri
 
 ## ✧ Funcionalidades
 
-A aplicação oferece um menu interativo com as seguintes opções:
+A interface gamificada permite que você acompanhe o crescimento das suas metas:
 
-*   **⊹ Plantar**: Adicione uma nova atividade ao seu jardim (plante uma nova semente).
-*   **⊹ Contemplar**: Visualize todos os seus canteiros, acompanhando o status, a evolução e o crescimento das suas atividades atuais.
-*   **⊹ Cuidar**: Regue o progresso das suas sementes (atualizando o andamento de uma tarefa) ou edite os detalhes para mantê-las saudáveis.
-*   **⊹ Colher**: Finalize projetos concluídos com sucesso (a colheita) ou faça a poda daquelas atividades que foram canceladas ou não são mais necessárias.
-*   **⊹ Sair**: Feche os portões do jardim até a sua próxima visita.
+* ⊹ Plantar (Criar): Adicione uma nova atividade ao seu jardim determinando o contexto, a dificuldade e o prazo.
+* ⊹ Contemplar (Ler): Visualize seus canteiros em um painel dinâmico. Cada tarefa possui uma barra de crescimento que vai de 0% a 100%.
+* ⊹ Regar (Atualizar): A cada interação, sua semente evolui visualmente pelos estágios: Semente ➔ Broto ➔ Muda ➔ Árvore ➔ Madura. Ao atingir 100%, ela está pronta para a colheita.
+* ⊹ Colher & Podar (Concluir/Deletar): Guarde seus projetos finalizados na Estufa de Histórico ou faça a poda definitiva de ideias que não seguirão em frente.
 
-## ✶ Como executar
 
-Certifique-se de ter o Python instalado na sua máquina.
+## Integração com Google Tasks
 
-1.  Abra o terminal e navegue até a pasta do projeto.
-2.  Execute o arquivo principal:
+O Ciberjardim não vive isolado. Ele possui uma integração direta e rigorosa com a API do Google Tasks:
 
-```bash
-python main.py
-```
+* ⊹ Sincronização de Plantio: Ao conectar a sua conta Google, toda semente plantada no Ciberjardim vira automaticamente uma tarefa no seu Google Tasks.
+* ⊹ Sincronização de Poda/Estufa: Quando uma planta é deletada ou movida para a estufa, o Back-end rastreia o ID da tarefa e a remove remotamente da nuvem do Google em tempo real.
+
+## ✶ Como Acessar
+
+O Ciberjardim está 100% online e pronto para uso! Você não precisa baixar ou instalar nenhum código.
+
+Basta acessar o link abaixo, conectar a sua conta do Google e começar a plantar as suas sementes:
+
+[Acessar o Ciberjardim](https://ciberjardim.vercel.app/)
