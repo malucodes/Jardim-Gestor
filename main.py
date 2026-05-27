@@ -38,6 +38,27 @@ class SementeAtualizar(BaseModel):
     concluir: Optional[bool] = False
     cesto: Optional[bool] = None
 
+def deletar_tarefa_google(nome_tarefa: str, token: str):
+    url_listar = "https://tasks.googleapis.com/tasks/v1/lists/@default/tasks"
+    headers = {"Authorization": f"Bearer {token}"}
+
+    try:
+        resposta = requests.get(url_listar, headers=headers, timeout=5)
+        if resposta.status_code == 200:
+            tarefas = resposta.json().get("items", [])
+
+            for tarefa in tarefas:
+                if tarefa.get("title") == nome_tarefa:
+                    id_tarefa = tarefa.get("id")
+                    url_deletar = f"https://tasks.googleapis.com/tasks/v1/lists/@default/tasks/{id_tarefa}"
+
+                    requests.delete(url_deletar, headers=headers, timeout=5)
+                    print(f"✅ Tarefa '{nome_tarefa}' deletada do Google Tasks!")
+                    break
+    except Exception as e:
+        print(f"Erro ao deletar no Google Tasks: {e}")
+# -------------------------------------------------------
+
 @app.get("/canteiros")
 def contemplar_jardim():
     canteiro = jardim_core.listar_projetos()
@@ -52,7 +73,6 @@ def plantar_semente(semente: SementeNova):
         semente.nome, semente.descricao, semente.contexto, semente.dificuldade, semente.prazo
     )
 
-    # --- INTEGRAÇÃO DIRETA COM GOOGLE TASKS ---
     if semente.google_token and semente.prazo and semente.prazo != "-":
         url_google = "https://tasks.googleapis.com/tasks/v1/lists/@default/tasks"
 
@@ -61,24 +81,25 @@ def plantar_semente(semente: SementeNova):
             "Content-Type": "application/json"
         }
 
-        # Junta a data do formulário (AAAA-MM-DD) com o formato de hora exigido pelo Google
-        prazo_final = f"{semente.prazo.strip()}T00:00:00Z"
+        prazo_final = f"{semente.prazo.strip()}T00:00:00.000Z"
 
         dados_tarefa = {
             "title": semente.nome,
             "notes": semente.descricao,
-            "due": prazo_final  # Este campo define o prazo de conclusão no Google
+            "due": prazo_final
         }
 
         try:
             requests.post(url_google, headers=headers, json=dados_tarefa, timeout=5)
+            print(f"✅ Tarefa '{semente.nome}' criada no Google Tasks!")
         except Exception as e:
             print(f"Erro ao enviar para o Google: {e}")
+    # ------------------------------------------
 
     return {"mensagem": "Plantada na nuvem!"}
 
 @app.put("/cuidar/{nome_atual}")
-def cuidar_semente(nome_atual: str, dados: SementeAtualizar):
+def cuidar_semente(nome_atual: str, dados: SementeAtualizar, token: Optional[str] = None):
     jardim_core.atualizar_projeto(
         nome_atual,
         novo_nome=dados.novo_nome,
@@ -86,11 +107,19 @@ def cuidar_semente(nome_atual: str, dados: SementeAtualizar):
         concluir=dados.concluir,
         cesto=dados.cesto
     )
+
+    if dados.cesto and token:
+        deletar_tarefa_google(nome_atual, token)
+
     return {"mensagem": "Cuidada com sucesso!"}
 
 @app.delete("/podar/{nome}")
-def podar_semente(nome: str):
+def podar_semente(nome: str, token: Optional[str] = None):
     jardim_core.deletar_projeto(nome)
+
+    if token:
+        deletar_tarefa_google(nome, token)
+
     return {"mensagem": f"Semente '{nome}' podada com sucesso."}
 
 if __name__ == "__main__":

@@ -91,9 +91,11 @@ function App() {
     }
   };
 
+  // --- ALTERAÇÃO 1: Enviando token ao deletar da estufa ---
   const confirmarExclusaoPermanenteCesto = async () => {
     try {
-      await fetch(`https://api-jardim.onrender.com/podar/${encodeURIComponent(sementeSelecionada)}`, {
+      const url = `https://api-jardim.onrender.com/podar/${encodeURIComponent(sementeSelecionada)}${googleToken ? `?token=${googleToken}` : ''}`;
+      await fetch(url, {
         method: 'DELETE'
       });
       setModalExclusaoCestoAberto(false);
@@ -104,12 +106,15 @@ function App() {
     }
   };
 
+  // --- ALTERAÇÃO 2: Enviando token ao podar ou mover para a estufa ---
   const confirmarPoda = async (acao) => {
     if (acao === 'descartar') {
-      await fetch(`https://api-jardim.onrender.com/podar/${encodeURIComponent(sementeSelecionada)}`, { method: 'DELETE' });
+      const url = `https://api-jardim.onrender.com/podar/${encodeURIComponent(sementeSelecionada)}${googleToken ? `?token=${googleToken}` : ''}`;
+      await fetch(url, { method: 'DELETE' });
       reagirMascote(IconeMascotePodar);
     } else if (acao === 'guardar') {
-      await fetch(`https://api-jardim.onrender.com/cuidar/${encodeURIComponent(sementeSelecionada)}`, {
+      const url = `https://api-jardim.onrender.com/cuidar/${encodeURIComponent(sementeSelecionada)}${googleToken ? `?token=${googleToken}` : ''}`;
+      await fetch(url, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cesto: true })
       });
       reagirMascote(IconeMascoteColher);
