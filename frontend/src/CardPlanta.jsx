@@ -29,36 +29,27 @@ export default function CardPlanta({
 
     let progresso = 15;
     let estagioNome = "Semente";
-    let estagioSub = "Escrevendo";
     let iconeFase = IconeSemente;
 
-    // --- NOVA LÓGICA DE MATURIDADE ---
     if (concluido) {
         progresso = 100;
         estagioNome = "Colheita";
-        estagioSub = "Concluída!";
         iconeFase = IconeColheita;
     } else if (quantidadeRegas >= 4) {
-        // Atingiu 100% de regas: Pronta para colher!
         progresso = 100;
         estagioNome = "Madura";
-        estagioSub = "Pronta para colher";
         iconeFase = IconeArvore;
     } else if (quantidadeRegas === 3) {
-        // Estágio de 85%: O botão de regar ainda aparece aqui
         progresso = 85;
         estagioNome = "Árvore";
-        estagioSub = "Quase pronta";
         iconeFase = IconeArvore;
     } else if (quantidadeRegas === 2) {
         progresso = 62;
         estagioNome = "Muda";
-        estagioSub = "Metade do caminho";
         iconeFase = IconeMuda;
     } else if (quantidadeRegas === 1) {
         progresso = 38;
         estagioNome = "Broto";
-        estagioSub = "Em andamento";
         iconeFase = IconeBroto;
     }
 
@@ -106,7 +97,6 @@ export default function CardPlanta({
                     </button>
                 ) : (
                     <>
-                        {/* MAGIA AQUI: O botão Regar só é desenhado na tela se o progresso for menor que 100 */}
                         {progresso < 100 && (
                             <button
                                 className="btn btn-secundario"

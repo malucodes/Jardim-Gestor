@@ -1,5 +1,4 @@
 import os
-import mysql.connector
 from mysql.connector import pooling
 from dotenv import load_dotenv
 
@@ -92,18 +91,18 @@ def inicializar_banco():
     db = conectar()
     cursor = db.cursor()
     cursor.execute("""
-                   CREATE TABLE IF NOT EXISTS sementes (
-                                                           id INT AUTO_INCREMENT PRIMARY KEY,
-                                                           nome VARCHAR(255) NOT NULL,
-                       descricao TEXT,
-                       contexto VARCHAR(100),
-                       dificuldade VARCHAR(50),
-                       prazo VARCHAR(100),
-                       concluido BOOLEAN DEFAULT FALSE,
-                       cesto BOOLEAN DEFAULT FALSE,
-                       quantidade_regas INT DEFAULT 0
-                       );
-                   """)
+        CREATE TABLE IF NOT EXISTS sementes (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nome VARCHAR(255) NOT NULL,
+        descricao TEXT,
+        contexto VARCHAR(100),
+        dificuldade VARCHAR(50),
+        prazo VARCHAR(100),
+        concluido BOOLEAN DEFAULT FALSE,
+        cesto BOOLEAN DEFAULT FALSE,
+        quantidade_regas INT DEFAULT 0
+        );
+    """)
     db.commit()
     db.close()
     print("🌱 Terreno do banco de dados e Pool de Conexões preparados com sucesso!")
