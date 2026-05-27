@@ -91,7 +91,6 @@ function App() {
     }
   };
 
-  // --- ALTERAÇÃO 1: Enviando token ao deletar da estufa ---
   const confirmarExclusaoPermanenteCesto = async () => {
     try {
       const url = `https://api-jardim.onrender.com/podar/${encodeURIComponent(sementeSelecionada)}${googleToken ? `?token=${googleToken}` : ''}`;
@@ -106,7 +105,6 @@ function App() {
     }
   };
 
-  // --- ALTERAÇÃO 2: Enviando token ao podar ou mover para a estufa ---
   const confirmarPoda = async (acao) => {
     if (acao === 'descartar') {
       const url = `https://api-jardim.onrender.com/podar/${encodeURIComponent(sementeSelecionada)}${googleToken ? `?token=${googleToken}` : ''}`;
