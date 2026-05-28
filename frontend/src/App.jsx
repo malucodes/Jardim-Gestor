@@ -28,11 +28,27 @@ function App() {
 
   const [googleToken, setGoogleToken] = useState(null);
 
+  const [usuarioId, setUsuarioId] = useState("jardineiro_anonimo");
+  const [nomeUsuario, setNomeUsuario] = useState("Jardineiro");
+
   const conectarGoogle = useGoogleLogin({
-    scope: 'https://www.googleapis.com/auth/tasks',
-    onSuccess: (tokenResponse) => {
+    scope: 'https://www.googleapis.com/auth/tasks openid email profile',
+    onSuccess: async (tokenResponse) => {
       setGoogleToken(tokenResponse.access_token);
-      alert("Tarefas conectadas com sucesso! 🌿");
+
+      try {
+        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+        });
+        const perfil = await res.json();
+
+        setUsuarioId(perfil.email);
+        setNomeUsuario(perfil.given_name);
+        alert(`Bem-vinda(o), ${perfil.given_name}! Tarefas conectadas com sucesso! 🌿`);
+
+      } catch (erro) {
+        console.error("Erro ao buscar perfil do usuário:", erro);
+      }
     },
     onError: (error) => console.log('Erro ao conectar:', error),
   });
@@ -42,17 +58,25 @@ function App() {
     setTimeout(() => { setMascoteAtual(IconeMascotePadrao); }, 100000);
   };
 
+
   const carregarJardim = async () => {
-    const resposta = await fetch('https://api-jardim.onrender.com/canteiros');
+    const resposta = await fetch('https://api-jardim.onrender.com/canteiros', {
+      headers: { 'usuario-id': usuarioId }
+    });
     const dados = await resposta.json();
     setSementes(dados.sementes);
   };
 
-  useEffect(() => { carregarJardim(); }, []);
+  useEffect(() => { carregarJardim(); }, [usuarioId]);
 
   const lidarComNovoPlantio = async (dadosSemente) => {
     const resposta = await fetch('https://api-jardim.onrender.com/plantar', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dadosSemente)
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'usuario-id': usuarioId
+      },
+      body: JSON.stringify(dadosSemente)
     });
     if (!resposta.ok) { alert("Semente já existe ou erro de formato!"); return; }
     setModalPlantarAberto(false);
@@ -67,7 +91,12 @@ function App() {
 
   const confirmarRega = async (nomeAntigo, novoNome) => {
     await fetch(`https://api-jardim.onrender.com/cuidar/${encodeURIComponent(nomeAntigo)}`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ novo_nome: novoNome, regar: true })
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'usuario-id': usuarioId
+      },
+      body: JSON.stringify({ novo_nome: novoNome, regar: true })
     });
     setModalRegaAberto(false);
     carregarJardim();
@@ -76,7 +105,12 @@ function App() {
 
   const lidarComColheita = async (nomeSemente) => {
     await fetch(`https://api-jardim.onrender.com/cuidar/${encodeURIComponent(nomeSemente)}`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ concluir: true })
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'usuario-id': usuarioId
+      },
+      body: JSON.stringify({ concluir: true })
     });
     carregarJardim();
     reagirMascote(IconeMascoteColher);
@@ -95,7 +129,8 @@ function App() {
     try {
       const url = `https://api-jardim.onrender.com/podar/${encodeURIComponent(sementeSelecionada)}${googleToken ? `?token=${googleToken}` : ''}`;
       await fetch(url, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: { 'usuario-id': usuarioId }
       });
       setModalExclusaoCestoAberto(false);
       carregarJardim();
@@ -108,12 +143,20 @@ function App() {
   const confirmarPoda = async (acao) => {
     if (acao === 'descartar') {
       const url = `https://api-jardim.onrender.com/podar/${encodeURIComponent(sementeSelecionada)}${googleToken ? `?token=${googleToken}` : ''}`;
-      await fetch(url, { method: 'DELETE' });
+      await fetch(url, {
+        method: 'DELETE',
+        headers: { 'usuario-id': usuarioId }
+      });
       reagirMascote(IconeMascotePodar);
     } else if (acao === 'guardar') {
       const url = `https://api-jardim.onrender.com/cuidar/${encodeURIComponent(sementeSelecionada)}${googleToken ? `?token=${googleToken}` : ''}`;
       await fetch(url, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cesto: true })
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'usuario-id': usuarioId
+        },
+        body: JSON.stringify({ cesto: true })
       });
       reagirMascote(IconeMascoteColher);
     }
@@ -132,7 +175,7 @@ function App() {
             <img src={mascoteAtual} alt="Ícone Mascote" style={{ width: '8em', transition: 'all 0.3s ease' }} />
             <div className="header-textos">
               <h1>Meu Jardim</h1>
-              <p>Bom dia, Jardineiro. O solo está fértil hoje!</p>
+              <p>Bom dia, {nomeUsuario}. O solo está fértil hoje!</p>
             </div>
           </div>
 
