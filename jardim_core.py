@@ -85,6 +85,7 @@ def deletar_projeto(nome_projeto):
     cursor.execute("DELETE FROM sementes WHERE nome = %s", (nome_projeto,))
     db.commit()
     db.close()
+
     return True
 
 def inicializar_banco():
