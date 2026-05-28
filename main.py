@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
@@ -56,20 +56,19 @@ def deletar_tarefa_google(nome_tarefa: str, token: str):
                     break
     except Exception as e:
         print(f"Erro ao deletar no Google Tasks: {e}")
-# -------------------------------------------------------
 
 @app.get("/canteiros")
-def contemplar_jardim():
-    canteiro = jardim_core.listar_projetos()
+def contemplar_jardim(usuario_id: str = Header(default="jardineiro_anonimo")):
+    canteiro = jardim_core.listar_projetos(usuario_id)
     return {"sementes": canteiro}
 
 @app.post("/plantar")
-def plantar_semente(semente: SementeNova):
-    if jardim_core.buscar_projeto(semente.nome):
+def plantar_semente(semente: SementeNova, usuario_id: str = Header(default="jardineiro_anonimo")):
+    if jardim_core.buscar_projeto(semente.nome, usuario_id):
         raise HTTPException(status_code=400, detail="Essa semente já está no solo!")
 
     jardim_core.adicionar_projeto(
-        semente.nome, semente.descricao, semente.contexto, semente.dificuldade, semente.prazo
+        semente.nome, semente.descricao, semente.contexto, semente.dificuldade, semente.prazo, usuario_id
     )
 
     if semente.google_token and semente.prazo and semente.prazo != "-":
@@ -98,9 +97,10 @@ def plantar_semente(semente: SementeNova):
     return {"mensagem": "Plantada na nuvem!"}
 
 @app.put("/cuidar/{nome_atual}")
-def cuidar_semente(nome_atual: str, dados: SementeAtualizar, token: Optional[str] = None):
+def cuidar_semente(nome_atual: str, dados: SementeAtualizar, token: Optional[str] = None, usuario_id: str = Header(default="jardineiro_anonimo")):
     jardim_core.atualizar_projeto(
         nome_atual,
+        usuario_id,
         novo_nome=dados.novo_nome,
         regar=dados.regar,
         concluir=dados.concluir,
@@ -113,8 +113,8 @@ def cuidar_semente(nome_atual: str, dados: SementeAtualizar, token: Optional[str
     return {"mensagem": "Cuidada com sucesso!"}
 
 @app.delete("/podar/{nome}")
-def podar_semente(nome: str, token: Optional[str] = None):
-    jardim_core.deletar_projeto(nome)
+def podar_semente(nome: str, token: Optional[str] = None, usuario_id: str = Header(default="jardineiro_anonimo")):
+    jardim_core.deletar_projeto(nome, usuario_id)
 
     if token:
         deletar_tarefa_google(nome, token)
