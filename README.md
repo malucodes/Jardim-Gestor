@@ -1,4 +1,4 @@
-# ✦ O Jardim do Conhecimento (Jardim-Gestor)
+# ✦ CiberJardim – O Jardim Gestor de Conhecimento 
 
 > "Nem toda semente brota no mesmo dia."
 
