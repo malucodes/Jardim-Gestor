@@ -8,6 +8,7 @@ import IconeMascotePodar from './assets/mascote_deletar.svg';
 import IconeCerca from './assets/cercas.svg'
 import IconeEstufa from './assets/estufa.svg'
 import IconeCalendario from './assets/calendario.svg'
+import IconeBroto from './assets/broto_em_andamento.svg'
 
 import CardPlanta from './CardPlanta';
 import FormularioPlantar from './FormularioPlantar';
@@ -28,8 +29,37 @@ function App() {
 
   const [googleToken, setGoogleToken] = useState(null);
 
-  const [usuarioId, setUsuarioId] = useState("jardineiro_anonimo");
+  const [modalBemVindoAberto, setModalBemVindoAberto] = useState(false);
+  const [apelidoInput, setApelidoInput] = useState("");
+
+  const [usuarioId, setUsuarioId] = useState("");
   const [nomeUsuario, setNomeUsuario] = useState("Jardineiro");
+
+  useEffect(() => {
+    const idSalvo = localStorage.getItem('ciberjardim_id');
+    const nomeSalvo = localStorage.getItem('ciberjardim_nome');
+
+    if (idSalvo) {
+      setUsuarioId(idSalvo);
+      setNomeUsuario(nomeSalvo || "Jardineiro");
+    } else {
+      setModalBemVindoAberto(true);
+    }
+  }, []);
+
+  const entrarComoVisitante = (e) => {
+    e.preventDefault();
+    if (!apelidoInput.trim()) return;
+
+    const novoId = `${apelidoInput.trim()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    localStorage.setItem('ciberjardim_id', novoId);
+    localStorage.setItem('ciberjardim_nome', apelidoInput.trim());
+
+    setUsuarioId(novoId);
+    setNomeUsuario(apelidoInput.trim());
+    setModalBemVindoAberto(false);
+  };
 
   const conectarGoogle = useGoogleLogin({
     scope: 'https://www.googleapis.com/auth/tasks openid email profile',
@@ -44,7 +74,7 @@ function App() {
 
         setUsuarioId(perfil.email);
         setNomeUsuario(perfil.given_name);
-        alert(`Bem-vinda(o), ${perfil.given_name}! Tarefas conectadas com sucesso! 🌿`);
+        alert(`Bem-vinda(o), ${perfil.given_name}! Tarefas conectadas com sucesso!`);
 
       } catch (erro) {
         console.error("Erro ao buscar perfil do usuário:", erro);
@@ -58,8 +88,9 @@ function App() {
     setTimeout(() => { setMascoteAtual(IconeMascotePadrao); }, 100000);
   };
 
-
   const carregarJardim = async () => {
+    if (!usuarioId) return;
+
     const resposta = await fetch('https://api-jardim.onrender.com/canteiros', {
       headers: { 'usuario-id': usuarioId }
     });
@@ -174,7 +205,7 @@ function App() {
           <div className="header-conteudo">
             <img src={mascoteAtual} alt="Ícone Mascote" style={{ width: '8em', transition: 'all 0.3s ease' }} />
             <div className="header-textos">
-              <h1>Meu Jardim</h1>
+              <h1>CiberJardim</h1>
               <p>Bom dia, {nomeUsuario}. O solo está fértil hoje!</p>
             </div>
           </div>
@@ -290,6 +321,40 @@ function App() {
                 onConfirmar={confirmarExclusaoPermanenteCesto}
                 onFechar={() => setModalExclusaoCestoAberto(false)}
             />
+        )}
+
+        {modalBemVindoAberto && (
+            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, backdropFilter: 'blur(3px)' }}>
+              <div style={{ backgroundColor: 'var(--white)', padding: '40px 32px', borderRadius: '16px', maxWidth: '400px', width: '90%', textAlign: 'center', boxShadow: '0 10px 30px rgba(0,0,0,0.2)', border: '2px solid var(--outline-light)' }}>
+                <img
+                    src={IconeBroto}
+                    alt="Ilustração de Boas-Vindas"
+                    style={{
+                      width: '120px',
+                      height: 'auto',
+                      marginBottom: '20px',
+                      borderRadius: '8px'
+                    }}
+                />
+                <h2 style={{ color: 'var(--earth-brown)', marginBottom: '12px' }}>Bem-vindo ao CiberJardim</h2>
+                <p style={{ color: 'var(--outline)', marginBottom: '24px', fontSize: '15px', lineHeight: '1.5' }}>
+                  Como você gostaria de ser chamado(a)? Cada jardineiro recebe um canteiro isolado e particular.
+                </p>
+                <form onSubmit={entrarComoVisitante}>
+                  <input
+                      type="text"
+                      placeholder="Digite o seu apelido..."
+                      value={apelidoInput}
+                      onChange={(e) => setApelidoInput(e.target.value)}
+                      style={{ width: '100%', padding: '14px', borderRadius: '8px', border: '2px solid var(--outline-light)', marginBottom: '20px', boxSizing: 'border-box', fontSize: '16px', fontFamily: 'inherit' }}
+                      required
+                  />
+                  <button type="submit" className="btn btn-primario" style={{ width: '100%', padding: '14px', fontSize: '16px' }}>
+                    Começar a Plantar
+                  </button>
+                </form>
+              </div>
+            </div>
         )}
 
       </div>
